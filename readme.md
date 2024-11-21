@@ -23,6 +23,12 @@ Screenshot of extension options:
 
 ## Getting started
 
+### Generating a token
+
+Create token on https://github.com/settings/personal-access-tokens/new
+ 1. Choose `All repositories`
+   1. Under `Repository Permissions` set `Pull Requests` to `Read only`
+
 ### 1️⃣ Create your own copy
 
 1. Click [<kbd>Use this template</kbd>](https://github.com/fregante/browser-extension-template/generate) to make a copy of your own. 😉

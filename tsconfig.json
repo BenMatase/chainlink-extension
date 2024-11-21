@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+      "target": "ES6",
+      "module": "ESNext",
+      "strict": true,
+      "esModuleInterop": true,
+      "moduleResolution": "node",
+      "resolveJsonModule": true,
+      "sourceMap": true,
+      "skipLibCheck": true
+    },
+    "include": ["source/**/*.ts"],
+    "exclude": ["node_modules", "distribution"]
+  }
