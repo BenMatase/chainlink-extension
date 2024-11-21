@@ -1,45 +1,37 @@
-# browser-extension-template
+# Chainlink
 
-[link-rgh]: https://github.com/sindresorhus/refined-github
-[link-ngh]: https://github.com/sindresorhus/notifier-for-github
-[link-hfog]: https://github.com/sindresorhus/hide-files-on-github
-[link-tsconfig]: https://github.com/sindresorhus/tsconfig
 [link-options-sync]: https://github.com/fregante/webext-options-sync
 [link-cws-keys]: https://github.com/fregante/chrome-webstore-upload-keys
 [link-amo-keys]: https://addons.mozilla.org/en-US/developers/addon/api/key
 
-> Cross-browser extension boilerplate - barebones template with Parcel 2, options handler and auto-publishing.
-
-Screenshot of extension options:
-
-![Sample extension options output](media/previewer.png)
+An extension which shows ancestor and descendant PRs on the Github PR page.
 
 ## Features
 
-- Uses Manifest v3
-- Use npm dependencies thanks to Parcel 2.
-- [Auto-syncing options](#auto-syncing-options).
-- [Auto-publishing](#publishing) with auto-versioning and support for manual releases.
+- Configure Github token in extension options
+- Quickly navigate the tree of PRs in your repo
+
+## Terminology
+
+- ancestor: a PR which is trying to merge the PR's base branch into some other branch
+- descendant: a PR which is trying to merge some other branch into the PR's branch
 
 ## Getting started
 
-### Generating a token
+### Using the Extension
 
-Create token on https://github.com/settings/personal-access-tokens/new
- 1. Choose `All repositories`
-   1. Under `Repository Permissions` set `Pull Requests` to `Read only`
+#### Generating a token
 
-### 1️⃣ Create your own copy
+1. Create token on https://github.com/settings/personal-access-tokens/new
+2. Choose `All repositories`
+3. Under `Repository Permissions` set `Pull Requests` to `Read only`
 
-1. Click [<kbd>Use this template</kbd>](https://github.com/fregante/browser-extension-template/generate) to make a copy of your own. 😉
-
-Note: When you create a repository from the template, the [Template Cleanup](.github/workflows/template-cleanup.yml) workflow will be triggered to delete and edit template-specific resources. Wait a moment until the workflow finishes (you will see a commit pushed with 'Template cleanup' message).
+### Contributing
 
 ### 🛠 Build locally
 
-1. Checkout the copied repository to your local machine eg. with `git clone https://github.com/my-username/my-awesome-extension/`
 1. Run `npm install` to install all required dependencies
-1. Run `npm run build`
+2. Run `npm run build`
 
 The build step will create the `distribution` folder, this folder will contain the generated extension.
 
@@ -48,18 +40,18 @@ The build step will create the `distribution` folder, this folder will contain t
 Using [web-ext](https://extensionworkshop.com/documentation/develop/getting-started-with-web-ext/) is recommended for automatic reloading and running in a dedicated browser instance. Alternatively you can load the extension manually (see below).
 
 1. Run `npm run watch` to watch for file changes and build continuously
-1. Run `npm install --global web-ext` (only only for the first time)
-1. In another terminal, run `web-ext run -t chromium`
-1. Check that the extension is loaded by opening the extension options ([in Firefox](media/extension_options_firefox.png) or [in Chrome](media/extension_options_chrome.png)).
+2. Run `npm install --global web-ext` (only only for the first time)
+3. In another terminal, run `web-ext run -t chromium`
+4. Check that the extension is loaded by opening the extension options ([in Firefox](media/extension_options_firefox.png) or [in Chrome](media/extension_options_chrome.png)).
 
 #### Manually
 
 You can also [load the extension manually in Chrome](https://www.smashingmagazine.com/2017/04/browser-extension-edge-chrome-firefox-opera-brave-vivaldi/#google-chrome-opera-vivaldi) or [Firefox](https://www.smashingmagazine.com/2017/04/browser-extension-edge-chrome-firefox-opera-brave-vivaldi/#mozilla-firefox).
 
-### ✏️ Make the first change
+### ✏️ Make a change
 
-1. For example, edit source\manifest.json to `"name": "My Awesome Extension",`
-1. Go back to your browser, reload and see the change take effect
+1. Make your amazing change
+2. Go back to your browser, reload and see the change take effect
 
 Note: Firefox will automatically reload content scripts when the extension is updated, Chrome requires you to reload the page to reload the content scripts.
 
@@ -110,14 +102,4 @@ Thanks to the included [GitHub Action Workflows](.github/workflows), if you set 
 
 ## Credits
 
-Extension icon made by [Freepik](https://www.freepik.com) from [www.flaticon.com](https://www.flaticon.com) is licensed by [CC 3.0 BY](http://creativecommons.org/licenses/by/3.0).
-
-## Extensions created using this template
-
-- [notlmn/copy-as-markdown](https://github.com/notlmn/copy-as-markdown) - Browser extension to copy hyperlinks, images, and selected text as Markdown.
-
-## License
-
-This browser extension template is released under [CC0](#license) and mentioned below. There is no `license` file included in here, but when you clone this template, you should include your own license file for the specific license you choose to use.
-
-[![CC0](https://mirrors.creativecommons.org/presskit/buttons/88x31/svg/cc-zero.svg)](https://creativecommons.org/publicdomain/zero/1.0/)
+link icon by Kosong Tujuh from [Noun Project](https://thenounproject.com/browse/icons/term/link/) [CC 3.0 BY](http://creativecommons.org/licenses/by/3.0)
