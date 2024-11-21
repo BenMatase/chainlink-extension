@@ -14,7 +14,7 @@ An extension which shows ancestor and descendant PRs on the Github PR page.
 ## Terminology
 
 - ancestor: a PR which is trying to merge the PR's base branch into some other branch
-- descendant: a PR which is trying to merge some other branch into the PR's branch
+- descendant: a PR which is trying to merge some other branch into the PR's head branch
 
 ## Getting started
 
@@ -23,7 +23,7 @@ An extension which shows ancestor and descendant PRs on the Github PR page.
 #### Generating a token
 
 1. Create token on https://github.com/settings/personal-access-tokens/new
-2. Choose `All repositories`
+2. Choose whichever repositories you want to restrict this extension to. For ease, you can use `All repositories`
 3. Under `Repository Permissions` set `Pull Requests` to `Read only`
 
 ### Contributing
