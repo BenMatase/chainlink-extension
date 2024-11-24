@@ -1,196 +1,167 @@
-import { rawListeners } from "process";
+import {Octokit} from '@octokit/core';
 
-const { Octokit } = require("@octokit/core")
+const listPrEndpoint = 'GET /repos/{owner}/{repo}/pulls';
+const getPrEndpoint = 'GET /repos/{owner}/{repo}/pulls/{pull_number}';
 
-const listPrEndpoint = 'GET /repos/{owner}/{repo}/pulls'
-const getPrEndpoint = 'GET /repos/{owner}/{repo}/pulls/{pull_number}'
+type OctokitType = InstanceType<typeof Octokit>;
 
-type OctokitType = InstanceType<typeof Octokit>
-
-export function getOctokit(authToken: string) : OctokitType {
-    return new Octokit({ auth: authToken })
+export function getOctokit(authToken: string): OctokitType {
+	return new Octokit({auth: authToken});
 }
 
-async function getPR(octokit: OctokitType, owner: string, repo: string, pull_number: Number) {
-    return (await octokit.request( getPrEndpoint, {
-        owner: owner,
-        repo: repo,
-        pull_number: pull_number
-    })).data
+type PrResponseData = {
+	title: string;
+	html_url: string;
+	state: string;
+	head: BranchPrResponseData;
+	base: BranchPrResponseData;
+};
+
+type BranchPrResponseData = {
+	label: string;
+	ref: string;
+};
+
+export type PrInfo = {
+	title: string;
+	href: string;
+	state: string;
+};
+
+export type Results = {
+	ancestorPrs: PrInfo[];
+	descendantPrs: PrInfo[];
+	requestedPr: any;
+};
+
+async function getPr(
+	octokit: OctokitType,
+	owner: string,
+	repo: string,
+	pullNumber: number,
+): Promise<PrResponseData> {
+	const {data} = await octokit.request(getPrEndpoint, {
+		owner,
+		repo,
+		// eslint-disable-next-line @typescript-eslint/naming-convention
+		pull_number: pullNumber,
+	});
+
+	return data;
 }
 
-// TODO: refactor these when I understand how ts/js does conditional params
-async function fetchAllPRsForRepo(octokit: OctokitType, owner: string, repo: string) {
-    const prs = []
-    let page = 1
-    while (true) {
-        const prsResult = await octokit.request(listPrEndpoint, {
-            owner: owner,
-            repo: repo,
-            state: 'open',
-            per_page: 100,
-            page: page,
-        })
+async function fetchAllPrsForRepoWithHead(
+	octokit: OctokitType,
+	owner: string,
+	repo: string,
+	head: string,
+): Promise<PrResponseData[]> {
+	const prs = [];
+	let page = 1;
+	while (page > 0) {
+		// eslint-disable-next-line no-await-in-loop
+		const prsResult = await octokit.request(listPrEndpoint, {
+			owner,
+			repo,
+			state: 'open',
+			// eslint-disable-next-line @typescript-eslint/naming-convention
+			per_page: 100,
+			page,
+			head,
+		});
 
-        if (prsResult.data.length === 0) break
-        prs.push(...prsResult.data)
-        page++
-    }
-    return prs
+		if (prsResult.data.length === 0) {
+			page = 0;
+			break;
+		}
+
+		prs.push(...prsResult.data);
+		page++;
+	}
+
+	return prs;
 }
 
-async function fetchAllPRsForRepoWithHead(octokit: OctokitType, owner: string, repo: string, head: string) {
-    const prs = []
-    let page = 1
-    while (true) {
-        const prsResult = await octokit.request(listPrEndpoint, {
-            owner: owner,
-            repo: repo,
-            state: 'open',
-            per_page: 100,
-            page: page,
-            head: head,
-        })
+async function fetchAllPrsForRepoWithBase(
+	octokit: OctokitType,
+	owner: string,
+	repo: string,
+	base: string,
+): Promise<PrResponseData[]> {
+	const prs = [];
+	let page = 1;
+	while (page > 0) {
+		// eslint-disable-next-line no-await-in-loop
+		const prsResult = await octokit.request(listPrEndpoint, {
+			owner,
+			repo,
+			state: 'open',
+			// eslint-disable-next-line @typescript-eslint/naming-convention
+			per_page: 100,
+			page,
+			base,
+		});
 
-        if (prsResult.data.length === 0) break
-        prs.push(...prsResult.data)
-        page++
-    }
-    return prs
+		if (prsResult.data.length === 0) {
+			page = 0;
+			break;
+		}
+
+		prs.push(...prsResult.data);
+		page++;
+	}
+
+	return prs;
 }
 
-async function fetchAllPRsForRepoWithBase(octokit: OctokitType, owner: string, repo: string, base: string) {
-    const prs = []
-    let page = 1
-    while (true) {
-        const prsResult = await octokit.request(listPrEndpoint, {
-            owner: owner,
-            repo: repo,
-            state: 'open',
-            per_page: 100,
-            page: page,
-            base: base,
-        })
+export async function generateResults(
+	octokit: OctokitType,
+	owner: string,
+	repo: string,
+	prNumber: number,
+): Promise<Results> {
+	let ancestorPrs = new Array<PrResponseData>();
+	let descendantPrs = new Array<PrResponseData>();
 
-        if (prsResult.data.length === 0) break
-        prs.push(...prsResult.data)
-        page++
-    }
-    return prs
+	const requestedPr = await getPr(octokit, owner, repo, prNumber);
+
+	// Base <= head
+	// 0 <= 1 ancestor
+	// 1 <= 2 this pr
+	// 2 <= 3 descendant
+
+	// ancestors are where their head is our base
+	// descendants are where their base is our head
+
+	// TODO: do these queries in parallel
+	ancestorPrs = await fetchAllPrsForRepoWithHead(
+		octokit,
+		owner,
+		repo,
+		requestedPr.base.label,
+	);
+	descendantPrs = await fetchAllPrsForRepoWithBase(
+		octokit,
+		owner,
+		repo,
+		requestedPr.head.ref,
+	); // Base arg is just the branch name
+
+	return {
+		ancestorPrs: ancestorPrs.map((x) => getInfo(x)),
+		descendantPrs: descendantPrs.map((x) => getInfo(x)),
+		requestedPr,
+	};
 }
 
-export async function generateResults(octokit: OctokitType, owner: string, repo: string, prNum: number, useCpuHeavy: boolean = false) {
-    let ancestorPrs = new Array<any>()
-    let descendantPrs = new Array<any>()
-    let requestedPr: any
+function getInfo(prResponseData: PrResponseData): PrInfo {
+	if (prResponseData === null) {
+		return prResponseData;
+	}
 
-    if (!useCpuHeavy) {
-        const requestedPr = await getPR(octokit, owner, repo, prNum)
-
-        // base <= head
-        // 0 <= 1 ancestor
-        // 1 <= 2 this pr
-        // 2 <= 3 descendant
-
-        // ancestors are where their head is our base
-        // descendants are where their base is our head
-
-        // console.log("requested PR")
-        // console.log(requestedPr)
-
-        // TODO: do these queries in parallel
-        ancestorPrs = await fetchAllPRsForRepoWithHead(octokit, owner, repo, requestedPr.base.label)
-        descendantPrs = await fetchAllPRsForRepoWithBase(octokit, owner, repo, requestedPr.head.ref) // base arg is just the branch name
-    } else {
-        [ancestorPrs, descendantPrs] = await generateCpuHeavyResults(octokit, owner, repo, prNum)
-
-    }
-
-    // console.log(ancestorPrs)
-    // console.log(descendantPrs)
-
-    return {
-        "ancestorPRs": ancestorPrs.map((x) => {return getInfo(x);}),
-        "descendantPRs": descendantPrs.map((x) => {return getInfo(x);}),
-        "requestedPR": requestedPr
-    }
-}
-
-async function generateCpuHeavyResults(octokit: OctokitType, owner: string, repo: string, prNum: number) {
-    const prs = await fetchAllPRsForRepo(octokit, owner, repo)
-
-    let branchToPr = new Map<string, Set<string>>()
-    let targetBranchToBranches = new Map<string, Set<string>>()
-
-    let targetBranchOfThisPr = null
-    let branchOfThisPr = null
-
-    prs.forEach((pr) => {
-        let prBranch = pr.head.label
-        let targetBranch = pr.base.label
-        if (pr["number"] == prNum) {
-            // TODO: use label which has org for cross org PR finding?
-            targetBranchOfThisPr = targetBranch
-            branchOfThisPr = prBranch
-        }
-
-        setWithCreation(branchToPr, prBranch, pr)
-
-        setWithCreation(targetBranchToBranches, targetBranch, prBranch)
-    })
-
-    if (targetBranchOfThisPr == null) { throw new Error("failed to find target branch of this pr") }
-    if (branchOfThisPr == null) { throw new Error("failed to find branch of this pr") }
-
-    // empty set indicates that the branch that it is targetting does not have a PR
-    let ancestorPrs = new Array()
-    if (branchToPr.has(targetBranchOfThisPr)) {
-        let prSet = branchToPr.get(targetBranchOfThisPr)
-        if (prSet) {
-            ancestorPrs = Array.from(prSet)
-        }
-    }
-
-    let descendantPrs = new Array()
-    if (targetBranchToBranches.has(branchOfThisPr)) {
-        let branchSet = targetBranchToBranches.get(branchOfThisPr)
-        if (!branchSet) {
-            throw new Error("programmer error!!")
-        }
-
-        branchSet.forEach((branch: string) => {
-            let prSet = branchToPr.get(branch)
-            if (prSet && prSet.size > 0) {
-                let prArray = Array.from(prSet)
-                descendantPrs.push(...prArray)
-            }
-        })
-    }
-
-    return [ancestorPrs, descendantPrs]
-}
-
-// TODO: make the set's any and value any the same by enforcement?
-function setWithCreation(map: Map<any, Set<any>>, key: any, value: any) {
-    if (!map.has(key)) {
-        map.set(key, new Set())
-    }
-    let keySet = map.get(key)
-    if (!keySet) {
-        // IMPOSSIBLE
-        throw new Error("programmer error!")
-    }
-    keySet.add(value)
-}
-
-function getInfo(pr: any) : any {
-    if (pr == null) {
-        return pr
-    }
-
-    return {
-        "title": pr["title"],
-        "href": pr["html_url"],
-        "state": pr["state"]
-    }
+	return {
+		title: prResponseData.title,
+		href: prResponseData.html_url,
+		state: prResponseData.state,
+	};
 }

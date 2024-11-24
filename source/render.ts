@@ -1,63 +1,64 @@
+import {type Results, type PrInfo} from './api.js';
 
-export function renderInDiv(resultDiv: any, result: any) {
-    if (resultDiv) {
-        // clear out div
-        while (resultDiv.firstChild) {
-            const lastChild = resultDiv.lastChild
-            if (lastChild) {
-                resultDiv.removeChild(lastChild)
-            }
-        }
+export function renderInDiv(resultDiv: HTMLDivElement, results: Results) {
+	if (resultDiv) {
+		// Clear out div
+		while (resultDiv.firstChild) {
+			const lastChild = resultDiv.lastChild;
+			if (lastChild) {
+				lastChild.remove();
+			}
+		}
 
-        const h3a = document.createElement('h4')
-        h3a.textContent = "Ancestor PRs"
-        resultDiv.appendChild(h3a)
+		const h3a = document.createElement('h4');
+		h3a.textContent = 'Ancestor PRs';
+		resultDiv.append(h3a);
 
-        renderList(resultDiv, result.ancestorPRs)
+		renderList(resultDiv, results.ancestorPrs);
 
-        const h3d = document.createElement('h4')
-        h3d.textContent = "Descendant PRs"
-        resultDiv.appendChild(h3d)
+		const h3d = document.createElement('h4');
+		h3d.textContent = 'Descendant PRs';
+		resultDiv.append(h3d);
 
-        renderList(resultDiv, result.descendantPRs)
-    }
+		renderList(resultDiv, results.descendantPrs);
+	}
 }
 
-function renderList(div: HTMLElement, l: Array<any>) {
-    if (l.length > 0) {
-        const ul = document.createElement('ul')
+function renderList(div: HTMLElement, l: PrInfo[]) {
+	if (l.length > 0) {
+		const ul = document.createElement('ul');
 
-        // sort by state (open vs closed, etc), then by title
-        l.sort((a, b) => {
-            let statesCompare = b.state.localeCompare(a.state)
-            if (statesCompare !== 0) {
-                return statesCompare
-            }
+		// Sort by state (open vs closed, etc), then by title
+		l.sort((a, b) => {
+			const statesCompare = b.state.localeCompare(a.state);
+			if (statesCompare !== 0) {
+				return statesCompare;
+			}
 
-            return b.title.localeCompare(a.title)
-        })
+			return b.title.localeCompare(a.title);
+		});
 
-        l.forEach((pr:any) => {
-            const li = document.createElement('li')
+		for (const pr of l) {
+			const li = document.createElement('li');
 
-            const a = document.createElement('a')
+			const a = document.createElement('a');
 
-            a.textContent = "(" + pr.state + ") " + pr.title
-            a.href = pr.href
+			a.textContent = `(${pr.state}) ${pr.title}`;
+			a.href = pr.href;
 
-            li.appendChild(a)
+			li.append(a);
 
-            ul.appendChild(li)
-        })
+			ul.append(li);
+		}
 
-        div.appendChild(ul)
-    } else {
-        addNone(div)
-    }
+		div.append(ul);
+	} else {
+		addNone(div);
+	}
 }
 
 function addNone(div: HTMLElement) {
-    const p = document.createElement('p')
-    p.textContent = "None"
-    div.appendChild(p)
+	const p = document.createElement('p');
+	p.textContent = 'None';
+	div.append(p);
 }
