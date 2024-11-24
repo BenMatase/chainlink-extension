@@ -19,7 +19,7 @@
 		"128": "images/icon-128.png"
 	},
 	"permissions": [
-		"storage"
+		"storage", "webNavigation", "scripting"
 	],
 	"host_permissions": [
 		"https://github.com/*"
@@ -36,8 +36,8 @@
 		"page": "options.html"
 	},
 	"background": {
-		"service_worker": "background.js",
+		"service_worker": "background.ts",
 		"type": "module",
-		"scripts": [ "background.js" ]
+		"scripts": [ "background.ts" ]
 	}
 }

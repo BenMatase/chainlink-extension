@@ -43,6 +43,7 @@
 		"@parcel/config-webextension": "^2.13.0",
 		"@parcel/resolver-default": "^2.13.0",
 		"@parcel/transformer-typescript-tsc": "^2.13.0",
+		"@types/chrome": "^0.0.283",
 		"@types/webextension-polyfill": "^0.12.1",
 		"npm-run-all2": "^7.0.1",
 		"parcel": "^2.13.0",
@@ -51,6 +52,7 @@
 		"stylelint-config-prettier": "^9.0.5",
 		"stylelint-config-xo": "^1.0.2",
 		"typescript": "^5.4.2",
+		"webextension-manifest": "^1.0.0",
 		"xo": "^0.59.3"
 	},
 	"@parcel/resolver-default": {

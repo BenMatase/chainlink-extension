@@ -6,6 +6,7 @@ import {renderInDiv} from './render.js';
 console.log('💈 Content script loaded for', browser.runtime.getManifest().name);
 
 const urlRegexp = /github\.com\/([\w-.]+)\/([\w-.]+)\/pull\/(\d+)/g;
+const chainlinkAddedId = 'chainlink-added';
 
 async function init() {
 	const options = await optionsStorage.getAll();
@@ -48,6 +49,7 @@ function findAndRender(data: Results) {
 	}
 
 	const resultDiv = document.createElement('div');
+	resultDiv.id = chainlinkAddedId;
 	parentDiv.append(resultDiv);
 
 	renderInDiv(resultDiv, data);
