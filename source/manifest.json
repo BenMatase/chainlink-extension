@@ -22,7 +22,7 @@
 		"storage", "webNavigation", "scripting"
 	],
 	"host_permissions": [
-		"https://github.com/*"
+		"https://github.com/*/pull/*"
 	],
 	"content_scripts": [
 		{
