@@ -55,6 +55,21 @@ function findAndRender(data: Results) {
 	renderInDiv(resultDiv, data);
 }
 
-init().catch((error: unknown) => {
-	console.error(error);
+let previousUrl = '';
+const observer = new MutationObserver(function (mutations) {
+	if (location.href !== previousUrl) {
+		previousUrl = location.href;
+		console.log(
+			`URL changed to ${location.href}, triggering chainlink content script`,
+		);
+		init().catch((error: unknown) => {
+			console.error(error);
+		});
+	}
 });
+
+// I tried to have this observer on less things, such as the request-id meta tag, but
+// since github does a lot of churn on the elements, best I could figure out is to watch
+// everything that changes in head and then make sure the logic only triggers once.
+const config = {subtree: true, childList: true};
+observer.observe(document.head, config);
