@@ -120,9 +120,6 @@ export async function generateResults(
 	repo: string,
 	prNumber: number,
 ): Promise<Results> {
-	let ancestorPrs = new Array<PrResponseData>();
-	let descendantPrs = new Array<PrResponseData>();
-
 	const requestedPr = await getPr(octokit, owner, repo, prNumber);
 
 	// Base <= head
@@ -133,19 +130,10 @@ export async function generateResults(
 	// ancestors are where their head is our base
 	// descendants are where their base is our head
 
-	// TODO: do these queries in parallel
-	ancestorPrs = await fetchAllPrsForRepoWithHead(
-		octokit,
-		owner,
-		repo,
-		requestedPr.base.label,
-	);
-	descendantPrs = await fetchAllPrsForRepoWithBase(
-		octokit,
-		owner,
-		repo,
-		requestedPr.head.ref,
-	); // Base arg is just the branch name
+	const [ancestorPrs, descendantPrs] = await Promise.all([
+		fetchAllPrsForRepoWithHead(octokit, owner, repo, requestedPr.base.label),
+		fetchAllPrsForRepoWithBase(octokit, owner, repo, requestedPr.head.ref),
+	]);
 
 	return {
 		ancestorPrs: ancestorPrs.map((x) => getInfo(x)),
