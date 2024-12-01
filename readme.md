@@ -22,10 +22,11 @@ An extension which shows ancestor and descendant PRs on the Github PR page.
 
 #### Generating a token
 
-
 ##### Token (classic)
 
-Quick link: https://github.com/settings/tokens/new?description=Chainlink%20Extension&scopes=repo
+[Quick link with prefilled data](https://github.com/settings/tokens/new?description=Chainlink%20Extension&scopes=repo)
+
+Or DIY:
 
 1. [Generate a token](https://github.com/settings/tokens/new)
 2. Check the box next to `repo`
