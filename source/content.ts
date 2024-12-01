@@ -57,9 +57,6 @@ let previousUrl = '';
 const observer = new MutationObserver(function (mutations) {
 	if (location.href !== previousUrl) {
 		previousUrl = location.href;
-		if (!urlRegexp.test(location.href)) {
-			return;
-		}
 
 		console.log(
 			`URL changed to ${location.href}, triggering chainlink content script`,
