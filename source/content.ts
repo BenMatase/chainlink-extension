@@ -8,10 +8,8 @@ console.log('💈 Content script loaded for', browser.runtime.getManifest().name
 const urlRegexp = /github\.com\/([\w-.]+)\/([\w-.]+)\/pull\/(\d+)/g;
 const chainlinkAddedId = 'chainlink-added';
 
-async function init() {
+async function addContent(url: string) {
 	const options = await optionsStorage.getAll();
-
-	const url = window.location.href;
 
 	const matches = url.matchAll(urlRegexp);
 	const matchesArray = Array.from(matches)[0];
@@ -59,10 +57,14 @@ let previousUrl = '';
 const observer = new MutationObserver(function (mutations) {
 	if (location.href !== previousUrl) {
 		previousUrl = location.href;
+		if (!urlRegexp.test(location.href)) {
+			return;
+		}
+
 		console.log(
 			`URL changed to ${location.href}, triggering chainlink content script`,
 		);
-		init().catch((error: unknown) => {
+		addContent(location.href).catch((error: unknown) => {
 			console.error(error);
 		});
 	}
