@@ -22,7 +22,17 @@ An extension which shows ancestor and descendant PRs on the Github PR page.
 
 #### Generating a token
 
-1. Create token on https://github.com/settings/personal-access-tokens/new
+
+##### Token (classic)
+
+Quick link: https://github.com/settings/tokens/new?description=Chainlink%20Extension&scopes=repo
+
+1. [Generate a token](https://github.com/settings/tokens/new)
+2. Check the box next to `repo`
+
+##### Fine Grained Token
+
+1. Go to https://github.com/settings/personal-access-tokens/new
 2. Choose whichever repositories you want to restrict this extension to. For ease, you can use `All repositories`
 3. Under `Repository Permissions` set `Pull Requests` to `Read only`
 
