@@ -19,7 +19,7 @@
 		"128": "images/icon-128.png"
 	},
 	"permissions": [
-		"storage", "webNavigation", "scripting"
+		"storage"
 	],
 	"host_permissions": [
 		"https://github.com/*/pull/*"
