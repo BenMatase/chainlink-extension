@@ -63,7 +63,7 @@ async function fetchAllPrsForRepoWithHead(
 		const prsResult = await octokit.request(listPrEndpoint, {
 			owner,
 			repo,
-			state: 'open',
+			state: 'all',
 			// eslint-disable-next-line @typescript-eslint/naming-convention
 			per_page: 100,
 			page,
@@ -95,7 +95,7 @@ async function fetchAllPrsForRepoWithBase(
 		const prsResult = await octokit.request(listPrEndpoint, {
 			owner,
 			repo,
-			state: 'open',
+			state: 'all',
 			// eslint-disable-next-line @typescript-eslint/naming-convention
 			per_page: 100,
 			page,
