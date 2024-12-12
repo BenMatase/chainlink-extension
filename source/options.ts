@@ -7,4 +7,6 @@ async function init() {
 	await optionsStorage.syncForm('#options-form');
 }
 
-init();
+init().catch((error: unknown) => {
+	console.error(error);
+});
