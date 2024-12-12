@@ -3,8 +3,6 @@ import 'webext-base-css';
 import './options.css';
 import optionsStorage from './options-storage.js';
 
-// Const output = document.querySelector('.color-output');
-
 async function init() {
 	await optionsStorage.syncForm('#options-form');
 }
