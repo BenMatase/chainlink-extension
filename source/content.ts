@@ -29,7 +29,6 @@ async function addContent(url: string) {
 
 	generateResults(octokit, owner, repo, pullNumber)
 		.then((data: Results) => {
-			console.log(data);
 			findAndRender(data);
 		})
 		.catch((error: unknown) => {
@@ -42,7 +41,7 @@ async function addContent(url: string) {
 function findAndRender(data: Results) {
 	const parentDiv = document.querySelector('#partial-discussion-header');
 	if (parentDiv === null) {
-		console.log('failed to find parent div');
+		console.error('failed to find parent div');
 		return;
 	}
 
