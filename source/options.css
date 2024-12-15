@@ -64,3 +64,35 @@ input[type='text'] {
 		display: block;
 	}
 }
+
+.text-inputs {
+    position: relative; /* Important for absolute positioning of child elements */
+}
+
+.token-input {
+    position: relative;
+    display: block; /* Ensures the label takes full width */
+    width: 100%;
+}
+
+.password-input {
+    width: 100%; /* Full width of the parent */
+    padding-right: 40px; /* Space for the eye icon */
+}
+
+.toggle-visibility {
+    position: absolute;
+    right: 10px; /* Adjust distance from right edge */
+    top: 50%; /* Center vertically */
+    transform: translateY(0%); /* Precise vertical centering */
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+}
+
+.eye-icon {
+    width: 24px;
+    height: 24px;
+    fill: #888; /* Soft gray color */
+}
