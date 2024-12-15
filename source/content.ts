@@ -7,6 +7,7 @@ console.log('💈 Content script loaded for', browser.runtime.getManifest().name
 
 const urlRegexp = /github\.com\/([\w-.]+)\/([\w-.]+)\/pull\/(\d+)/g;
 const chainlinkAddedId = 'chainlink-added';
+const chainlinkAddedIdSelector = `#${chainlinkAddedId}`;
 
 async function addContent(url: string) {
 	const options = await optionsStorage.getAll();
@@ -34,11 +35,21 @@ async function addContent(url: string) {
 		.catch((error: unknown) => {
 			console.error(error);
 		});
-
-	// TODO: largest problem is now that links will now have it rerender
 }
 
 function findAndRender(data: Results) {
+	// TODO: this is a hack, since the script is watching on so many observers,
+	// this will fire before the old page will render, so the div is already there.
+	// By putting it here, it is delayed enough to work properly
+	const alreadyRan =
+		document.body.querySelector(chainlinkAddedIdSelector) !== null;
+	if (alreadyRan) {
+		console.log(
+			'seems like extension has already ran on this page, skipping...',
+		);
+		return;
+	}
+
 	const parentDiv = document.querySelector('#partial-discussion-header');
 	if (parentDiv === null) {
 		console.error('failed to find parent div');
