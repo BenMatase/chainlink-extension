@@ -10,20 +10,28 @@ const chainlinkAddedId = 'chainlink-added';
 const chainlinkAddedIdSelector = `#${chainlinkAddedId}`;
 
 async function addContent(url: string) {
-	const options = await optionsStorage.getAll();
-
 	const matches = url.matchAll(urlRegexp);
-	const matchesArray = Array.from(matches)[0];
+	const matchesArray = Array.from(matches);
 
-	if (matchesArray.length !== 4) {
-		console.error(
-			`got invalid number (${matchesArray.length}) of matches: ${matchesArray.toString()}`,
-		);
+	if (matchesArray.length === 0) {
+		console.log('chainlink does not care about this page, skipping');
+		return;
 	}
 
-	const owner = matchesArray[1];
-	const repo = matchesArray[2];
-	const pullNumber = Number.parseInt(matchesArray[3], 10);
+	const match = matchesArray[0];
+
+	if (match.length !== 4) {
+		console.error(
+			`got invalid number (${match.length}) of matches: ${match.toString()}`,
+		);
+		return;
+	}
+
+	const options = await optionsStorage.getAll();
+
+	const owner = match[1];
+	const repo = match[2];
+	const pullNumber = Number.parseInt(match[3], 10);
 
 	// TODO: make sure token is populated
 	const octokit = getOctokit(options.token);

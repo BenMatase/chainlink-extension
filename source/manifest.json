@@ -26,7 +26,7 @@
 	],
 	"content_scripts": [
 		{
-			"matches":    ["https://github.com/*/pull/*"],
+			"matches":    ["https://github.com/*"],
 			"js": [ "content.ts" ],
 			"css": [ "content.css" ],
 			"run_at": "document_end"
