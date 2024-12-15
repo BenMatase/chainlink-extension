@@ -37,6 +37,10 @@ Or DIY:
 2. Choose whichever repositories you want to restrict this extension to. For ease, you can use `All repositories`
 3. Under `Repository Permissions` set `Pull Requests` to `Read only`
 
+### Trying It Out
+
+There is a sister repo called [chainlink-sandbox](https://github.com/BenMatase/chainlink-sandbox) which has some [dummy PRs](https://github.com/BenMatase/chainlink-sandbox/pull/2) which will illustrate the value of the extension.
+
 ### Contributing
 
 ### 🛠 Build locally
