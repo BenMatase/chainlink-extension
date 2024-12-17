@@ -1,3 +1,6 @@
+
+![icon-128 png](https://github.com/user-attachments/assets/d6f3e209-4758-4fd3-b8d9-83e63380d5a2)
+
 # Chainlink
 
 [link-options-sync]: https://github.com/fregante/webext-options-sync
