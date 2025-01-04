@@ -10,24 +10,39 @@ export function renderInDiv(resultDiv: HTMLDivElement, results: Results) {
 			}
 		}
 
-		const h3a = document.createElement('h4');
-		h3a.textContent = 'Ancestor PRs';
-		resultDiv.append(h3a);
+		resultDiv.style.display = 'flex';
 
-		renderList(resultDiv, results.ancestorPrs);
+		const ancestorDiv = document.createElement('div');
+		ancestorDiv.style.width = '33.3%';
 
-		const h3d = document.createElement('h4');
-		h3d.textContent = 'Descendant PRs';
-		resultDiv.append(h3d);
+		renderHeader(ancestorDiv, 'Ancestor PRs');
+		renderList(ancestorDiv, results.ancestorPrs);
 
-		renderList(resultDiv, results.descendantPrs);
+		resultDiv.append(ancestorDiv);
 
-		const h3s = document.createElement('h4');
-		h3s.textContent = 'Sibling PRs';
-		resultDiv.append(h3s);
+		const siblingDiv = document.createElement('div');
+		siblingDiv.style.width = '33.3%';
 
-		renderList(resultDiv, results.siblingPrs);
+		renderHeader(siblingDiv, 'Sibling PRs');
+		renderList(siblingDiv, results.siblingPrs);
+
+		resultDiv.append(siblingDiv);
+
+		const descendantDiv = document.createElement('div');
+		descendantDiv.style.width = '33.3%';
+
+		renderHeader(descendantDiv, 'Descendant PRs');
+		renderList(descendantDiv, results.descendantPrs);
+
+		resultDiv.append(descendantDiv);
 	}
+}
+
+function renderHeader(div: HTMLElement, text: string) {
+	const header = document.createElement('h4');
+	header.textContent = text;
+
+	div.append(header);
 }
 
 function renderList(div: HTMLElement, l: PrInfo[]) {
