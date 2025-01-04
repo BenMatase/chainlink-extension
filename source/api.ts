@@ -10,6 +10,7 @@ export function getOctokit(authToken: string): OctokitType {
 }
 
 type PrResponseData = {
+	number: number;
 	title: string;
 	html_url: string;
 	state: string;
@@ -26,11 +27,13 @@ export type PrInfo = {
 	title: string;
 	href: string;
 	state: string;
+	number: number;
 };
 
 export type Results = {
 	ancestorPrs: PrInfo[];
 	descendantPrs: PrInfo[];
+	siblingPrs: PrInfo[];
 	requestedPr: any;
 };
 
@@ -126,18 +129,23 @@ export async function generateResults(
 	// 0 <= 1 ancestor
 	// 1 <= 2 this pr
 	// 2 <= 3 descendant
+	// 1 <= 4 sibling pr
 
 	// ancestors are where their head is our base
 	// descendants are where their base is our head
 
-	const [ancestorPrs, descendantPrs] = await Promise.all([
+	const [ancestorPrs, descendantPrs, allSiblingPrs] = await Promise.all([
 		fetchAllPrsForRepoWithHead(octokit, owner, repo, requestedPr.base.label),
 		fetchAllPrsForRepoWithBase(octokit, owner, repo, requestedPr.head.ref),
+		fetchAllPrsForRepoWithBase(octokit, owner, repo, requestedPr.base.ref),
 	]);
+
+	const siblingPrs = allSiblingPrs.filter((pr) => pr.number !== prNumber);
 
 	return {
 		ancestorPrs: ancestorPrs.map((x) => getInfo(x)),
 		descendantPrs: descendantPrs.map((x) => getInfo(x)),
+		siblingPrs: siblingPrs.map((x) => getInfo(x)),
 		requestedPr,
 	};
 }
@@ -151,5 +159,6 @@ function getInfo(prResponseData: PrResponseData): PrInfo {
 		title: prResponseData.title,
 		href: prResponseData.html_url,
 		state: prResponseData.state,
+		number: prResponseData.number,
 	};
 }

@@ -21,6 +21,12 @@ export function renderInDiv(resultDiv: HTMLDivElement, results: Results) {
 		resultDiv.append(h3d);
 
 		renderList(resultDiv, results.descendantPrs);
+
+		const h3s = document.createElement('h4');
+		h3s.textContent = 'Sibling PRs';
+		resultDiv.append(h3s);
+
+		renderList(resultDiv, results.siblingPrs);
 	}
 }
 
