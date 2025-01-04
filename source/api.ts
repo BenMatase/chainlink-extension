@@ -14,6 +14,7 @@ type PrResponseData = {
 	title: string;
 	html_url: string;
 	state: string;
+	draft: boolean;
 	head: BranchPrResponseData;
 	base: BranchPrResponseData;
 };
@@ -27,6 +28,7 @@ export type PrInfo = {
 	title: string;
 	href: string;
 	state: string;
+	isDraft: boolean;
 	number: number;
 };
 
@@ -159,6 +161,7 @@ function getInfo(prResponseData: PrResponseData): PrInfo {
 		title: prResponseData.title,
 		href: prResponseData.html_url,
 		state: prResponseData.state,
+		isDraft: prResponseData.draft,
 		number: prResponseData.number,
 	};
 }
