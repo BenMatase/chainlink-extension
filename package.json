@@ -33,7 +33,6 @@
 	},
 	"dependencies": {
 		"@octokit/core": "^6.1.2",
-		"@primer/octicons": "^19.14.0",
 		"octokit": "^3.1.2",
 		"webext-base-css": "^2.0.1",
 		"webext-options-sync": "^4.2.3",
