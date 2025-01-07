@@ -15,6 +15,7 @@ type PrResponseData = {
 	html_url: string;
 	state: string;
 	draft: boolean;
+	merged_at?: string;
 	head: BranchPrResponseData;
 	base: BranchPrResponseData;
 };
@@ -27,8 +28,7 @@ type BranchPrResponseData = {
 export type PrInfo = {
 	title: string;
 	href: string;
-	state: string;
-	isDraft: boolean;
+	state: State;
 	number: number;
 };
 
@@ -157,11 +157,54 @@ function getInfo(prResponseData: PrResponseData): PrInfo {
 		return prResponseData;
 	}
 
+	const state = getState(prResponseData);
+
 	return {
 		title: prResponseData.title,
 		href: prResponseData.html_url,
-		state: prResponseData.state,
-		isDraft: prResponseData.draft,
+		state,
 		number: prResponseData.number,
 	};
+}
+
+export enum State {
+	Open = 'open',
+	Draft = 'draft',
+	Merged = 'merged',
+	Closed = 'closed',
+
+	Unknown = 'unknown',
+}
+
+// Giving each state a priority
+export const stateOrder: Record<State, number> = {
+	[State.Open]: 5,
+	[State.Draft]: 4,
+	[State.Merged]: 3,
+	[State.Closed]: 2,
+	[State.Unknown]: 1,
+};
+
+function getState(prResponseData: PrResponseData): State {
+	if (prResponseData.merged_at !== null) {
+		return State.Merged;
+	}
+
+	if (prResponseData.draft) {
+		return State.Draft;
+	}
+
+	switch (prResponseData.state) {
+		case 'open': {
+			return State.Open;
+		}
+
+		case 'closed': {
+			return State.Closed;
+		}
+
+		default: {
+			return State.Unknown;
+		}
+	}
 }
