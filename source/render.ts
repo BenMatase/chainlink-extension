@@ -49,6 +49,9 @@ function renderList(div: HTMLElement, l: PrInfo[]) {
 	if (l.length > 0) {
 		const ul = document.createElement('ul');
 
+		ul.style.maxHeight = '110px'; // Room for 5
+		ul.style.overflowY = 'auto'; // Scrolls
+
 		// Sort by state (open vs closed, etc), then by number
 		l.sort((a, b) => {
 			const statesCompare = stateOrder[b.state] - stateOrder[a.state];
