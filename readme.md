@@ -7,6 +7,9 @@
 [link-cws-keys]: https://github.com/fregante/chrome-webstore-upload-keys
 [link-amo-keys]: https://addons.mozilla.org/en-US/developers/addon/api/key
 
+[link-amo]: https://addons.mozilla.org/en-US/firefox/addon/chainlink-extension
+[link-cws]: https://chromewebstore.google.com/detail/copy-as-markdown/albohgemlgelgpingkpgbbpoomeeaojp
+
 An extension which shows ancestor and descendant PRs on the Github PR page.
 
 ## Features
@@ -18,8 +21,14 @@ An extension which shows ancestor and descendant PRs on the Github PR page.
 
 - ancestor: a PR which is trying to merge the PR's base branch into some other branch
 - descendant: a PR which is trying to merge some other branch into the PR's head branch
+- sibling: a PR which is trying to merge into the same branch the PR
 
 ## Getting started
+
+### Installation
+
+- [**Chrome** extension][link-cws] [<img valign="middle" src="https://img.shields.io/chrome-web-store/v/albohgemlgelgpingkpgbbpoomeeaojp.svg?label=%20">][link-cws]
+- [**Firefox** add-on][link-amo] [<img valign="middle" src="https://img.shields.io/amo/v/chainlink-extension.svg?label=%20">][link-amo]
 
 ### Using the Extension
 
