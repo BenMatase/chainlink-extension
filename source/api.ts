@@ -1,4 +1,5 @@
 import {Octokit} from '@octokit/core';
+import {type Options} from './options-storage.js';
 
 const listPrEndpoint = 'GET /repos/{owner}/{repo}/pulls';
 const getPrEndpoint = 'GET /repos/{owner}/{repo}/pulls/{pull_number}';
@@ -41,15 +42,13 @@ export type Results = {
 
 async function getPr(
 	octokit: OctokitType,
-	owner: string,
-	repo: string,
-	pullNumber: number,
+	prIdentifier: PrIdentifier,
 ): Promise<PrResponseData> {
 	const {data} = await octokit.request(getPrEndpoint, {
-		owner,
-		repo,
+		owner: prIdentifier.owner,
+		repo: prIdentifier.repo,
 		// eslint-disable-next-line @typescript-eslint/naming-convention
-		pull_number: pullNumber,
+		pull_number: prIdentifier.number,
 	});
 
 	return data;
@@ -119,13 +118,18 @@ async function fetchAllPrsForRepoWithBase(
 	return prs;
 }
 
+export type PrIdentifier = {
+	owner: string;
+	repo: string;
+	number: number;
+};
+
 export async function generateResults(
 	octokit: OctokitType,
-	owner: string,
-	repo: string,
-	prNumber: number,
+	options: Options,
+	prIdentifier: PrIdentifier,
 ): Promise<Results> {
-	const requestedPr = await getPr(octokit, owner, repo, prNumber);
+	const requestedPr = await getPr(octokit, prIdentifier);
 
 	// Base <= head
 	// 0 <= 1 ancestor
@@ -136,13 +140,21 @@ export async function generateResults(
 	// ancestors are where their head is our base
 	// descendants are where their base is our head
 
-	const [ancestorPrs, descendantPrs, allSiblingPrs] = await Promise.all([
-		fetchAllPrsForRepoWithHead(octokit, owner, repo, requestedPr.base.label),
-		fetchAllPrsForRepoWithBase(octokit, owner, repo, requestedPr.head.ref),
-		fetchAllPrsForRepoWithBase(octokit, owner, repo, requestedPr.base.ref),
+	const [ancestorPrs, descendantPrs, siblingPrs] = await Promise.all([
+		fetchAllPrsForRepoWithHead(
+			octokit,
+			prIdentifier.owner,
+			prIdentifier.repo,
+			requestedPr.base.label,
+		),
+		fetchAllPrsForRepoWithBase(
+			octokit,
+			prIdentifier.owner,
+			prIdentifier.repo,
+			requestedPr.head.ref,
+		),
+		fetchAndFilterSibilingPrs(octokit, options, prIdentifier, requestedPr),
 	]);
-
-	const siblingPrs = allSiblingPrs.filter((pr) => pr.number !== prNumber);
 
 	return {
 		ancestorPrs: ancestorPrs.map((x) => getInfo(x)),
@@ -150,6 +162,26 @@ export async function generateResults(
 		siblingPrs: siblingPrs.map((x) => getInfo(x)),
 		requestedPr,
 	};
+}
+
+async function fetchAndFilterSibilingPrs(
+	octokit: OctokitType,
+	options: Options,
+	prIdentifier: PrIdentifier,
+	requestedPr: PrResponseData,
+): Promise<PrResponseData[]> {
+	if (options.showSiblingPrs) {
+		return fetchAllPrsForRepoWithBase(
+			octokit,
+			prIdentifier.owner,
+			prIdentifier.repo,
+			requestedPr.base.ref,
+		).then((allSiblingPrs) =>
+			allSiblingPrs.filter((pr) => pr.number !== requestedPr.number),
+		);
+	}
+
+	return [];
 }
 
 function getInfo(prResponseData: PrResponseData): PrInfo {

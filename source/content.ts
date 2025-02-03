@@ -1,5 +1,5 @@
 import browser from 'webextension-polyfill';
-import optionsStorage from './options-storage.js';
+import {optionsStorage, type Options} from './options-storage.js';
 import {generateResults, getOctokit, type Results} from './api.js';
 import {renderInDiv} from './render.js';
 
@@ -36,16 +36,16 @@ async function addContent(url: string) {
 	// TODO: make sure token is populated
 	const octokit = getOctokit(options.token);
 
-	generateResults(octokit, owner, repo, pullNumber)
+	generateResults(octokit, options, {owner, repo, number: pullNumber})
 		.then((data: Results) => {
-			findAndRender(data);
+			findAndRender(options, data);
 		})
 		.catch((error: unknown) => {
 			console.error(error);
 		});
 }
 
-function findAndRender(data: Results) {
+function findAndRender(options: Options, data: Results) {
 	// TODO: this is a hack, since the script is watching on so many observers,
 	// this will fire before the old page will render, so the div is already there.
 	// By putting it here, it is delayed enough to work properly
@@ -68,7 +68,7 @@ function findAndRender(data: Results) {
 	resultDiv.id = chainlinkAddedId;
 	parentDiv.append(resultDiv);
 
-	renderInDiv(resultDiv, data);
+	renderInDiv(options, resultDiv, data);
 }
 
 let previousUrl = '';

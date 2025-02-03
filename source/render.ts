@@ -1,6 +1,11 @@
+import {type Options} from './options-storage.js';
 import {type Results, type PrInfo, State, stateOrder} from './api.js';
 
-export function renderInDiv(resultDiv: HTMLDivElement, results: Results) {
+export function renderInDiv(
+	options: Options,
+	resultDiv: HTMLDivElement,
+	results: Results,
+) {
 	if (resultDiv) {
 		// Clear out div
 		while (resultDiv.firstChild) {
@@ -23,8 +28,10 @@ export function renderInDiv(resultDiv: HTMLDivElement, results: Results) {
 		const siblingDiv = document.createElement('div');
 		siblingDiv.style.width = '33.3%';
 
-		renderHeader(siblingDiv, 'Sibling PRs');
-		renderList(siblingDiv, results.siblingPrs);
+		if (options.showSiblingPrs) {
+			renderHeader(siblingDiv, 'Sibling PRs');
+			renderList(siblingDiv, results.siblingPrs);
+		}
 
 		resultDiv.append(siblingDiv);
 
