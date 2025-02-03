@@ -4,6 +4,8 @@ import {type Options} from './options-storage.js';
 const listPrEndpoint = 'GET /repos/{owner}/{repo}/pulls';
 const getPrEndpoint = 'GET /repos/{owner}/{repo}/pulls/{pull_number}';
 
+const maxPerPage = 100;
+
 type OctokitType = InstanceType<typeof Octokit>;
 
 export function getOctokit(authToken: string): OctokitType {
@@ -62,24 +64,24 @@ async function fetchAllPrsForRepoWithHead(
 ): Promise<PrResponseData[]> {
 	const prs = [];
 	let page = 1;
-	while (page > 0) {
+	for (;;) {
 		// eslint-disable-next-line no-await-in-loop
 		const prsResult = await octokit.request(listPrEndpoint, {
 			owner,
 			repo,
 			state: 'all',
 			// eslint-disable-next-line @typescript-eslint/naming-convention
-			per_page: 100,
+			per_page: maxPerPage,
 			page,
 			head,
 		});
 
-		if (prsResult.data.length === 0) {
-			page = 0;
+		prs.push(...prsResult.data);
+
+		if (prsResult.data.length < maxPerPage) {
 			break;
 		}
 
-		prs.push(...prsResult.data);
 		page++;
 	}
 
@@ -94,24 +96,24 @@ async function fetchAllPrsForRepoWithBase(
 ): Promise<PrResponseData[]> {
 	const prs = [];
 	let page = 1;
-	while (page > 0) {
+	for (;;) {
 		// eslint-disable-next-line no-await-in-loop
 		const prsResult = await octokit.request(listPrEndpoint, {
 			owner,
 			repo,
 			state: 'all',
 			// eslint-disable-next-line @typescript-eslint/naming-convention
-			per_page: 100,
+			per_page: maxPerPage,
 			page,
 			base,
 		});
 
-		if (prsResult.data.length === 0) {
-			page = 0;
+		prs.push(...prsResult.data);
+
+		if (prsResult.data.length < maxPerPage) {
 			break;
 		}
 
-		prs.push(...prsResult.data);
 		page++;
 	}
 
