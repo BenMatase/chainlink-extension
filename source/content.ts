@@ -33,40 +33,54 @@ async function addContent(url: string) {
 	// TODO: make sure token is populated
 	const octokit = getOctokit(options.token);
 
+	const resultDiv = prepopulateTheResultDiv();
+
+	if (resultDiv === undefined) {
+		return;
+	}
+
 	generateResults(octokit, options, {owner, repo, number: pullNumber})
 		.then((data: Results) => {
-			findAndRender(options, data);
+			renderInDiv(options, resultDiv, data);
 		})
 		.catch((error: unknown) => {
 			console.error(error);
 		});
 }
 
-function findAndRender(options: Options, data: Results) {
-	// TODO: this is a hack, since the script is watching on so many observers,
-	// this will fire before the old page will render, so the div is already there.
-	// By putting it here, it is delayed enough to work properly
-	const alreadyRan =
-		document.body.querySelector(chainlinkAddedIdSelector) !== null;
-	if (alreadyRan) {
-		console.log(
-			'seems like extension has already ran on this page, skipping...',
-		);
-		return;
-	}
-
+function prepopulateTheResultDiv(): HTMLDivElement | undefined {
 	const parentDiv = document.querySelector('#partial-discussion-header');
 	if (parentDiv === null) {
 		console.error('failed to find parent div');
-		return;
+		return undefined;
 	}
 
 	const resultDiv = document.createElement('div');
 	resultDiv.id = chainlinkAddedId;
 	parentDiv.append(resultDiv);
 
-	renderInDiv(options, resultDiv, data);
+	return resultDiv;
 }
+
+// Function findAndRender(
+// 	resultDiv: HTMLDivElement,
+// 	options: Options,
+// 	data: Results,
+// ) {
+// 	// TODO: this is a hack, since the script is watching on so many observers,
+// 	// this will fire before the old page will render, so the div is already there.
+// 	// By putting it here, it is delayed enough to work properly
+// 	// const alreadyRan =
+// 	// 	document.body.querySelector(chainlinkAddedIdSelector) !== null;
+// 	// if (alreadyRan) {
+// 	// 	console.log(
+// 	// 		'seems like extension has already ran on this page, skipping...',
+// 	// 	);
+// 	// 	return;
+// 	// }
+
+// 	renderInDiv(options, resultDiv, data);
+// }
 
 let previousUrl = '';
 const observer = new MutationObserver(function (mutations) {
