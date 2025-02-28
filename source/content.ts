@@ -10,15 +10,12 @@ const chainlinkAddedId = 'chainlink-added';
 const chainlinkAddedIdSelector = `#${chainlinkAddedId}`;
 
 async function addContent(url: string) {
-	const matches = url.matchAll(urlRegexp);
-	const matchesArray = Array.from(matches);
+	const match = urlRegexp.exec(url);
 
-	if (matchesArray.length === 0) {
+	if (match === null) {
 		console.log('chainlink does not care about this page, skipping');
 		return;
 	}
-
-	const match = matchesArray[0];
 
 	if (match.length !== 4) {
 		console.error(
