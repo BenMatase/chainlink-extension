@@ -5,11 +5,11 @@ import {renderInDiv} from './render.js';
 
 console.log('💈 Content script loaded for', browser.runtime.getManifest().name);
 
-const urlRegexp = /github\.com\/([\w-.]+)\/([\w-.]+)\/pull\/(\d+)/g;
+const urlRegexp = /github\.com\/([\w-.]+)\/([\w-.]+)\/pull\/(\d+)/;
 const chainlinkAddedId = 'chainlink-added';
 const chainlinkAddedIdSelector = `#${chainlinkAddedId}`;
 
-async function addContent(url: string) {
+async function addContent(url: string, parentDiv: HTMLDivElement) {
 	const match = urlRegexp.exec(url);
 
 	if (match === null) {
@@ -33,8 +33,7 @@ async function addContent(url: string) {
 	// TODO: make sure token is populated
 	const octokit = getOctokit(options.token);
 
-	const resultDiv = prepopulateTheResultDiv();
-
+	const resultDiv = prepopulateTheResultDiv(parentDiv);
 	if (resultDiv === undefined) {
 		return;
 	}
@@ -48,56 +47,87 @@ async function addContent(url: string) {
 		});
 }
 
-function prepopulateTheResultDiv(): HTMLDivElement | undefined {
-	const parentDiv = document.querySelector('#partial-discussion-header');
-	if (parentDiv === null) {
-		console.error('failed to find parent div');
-		return undefined;
+function prepopulateTheResultDiv(
+	parentDiv: HTMLDivElement,
+): HTMLDivElement | undefined {
+	const oldResultDiv = document.body.querySelector(chainlinkAddedIdSelector);
+
+	const alreadyRan = oldResultDiv !== null;
+	if (alreadyRan) {
+		console.log(
+			'seems like extension has already ran on this page, returning existing',
+		);
+		return oldResultDiv;
 	}
 
 	const resultDiv = document.createElement('div');
 	resultDiv.id = chainlinkAddedId;
+	resultDiv.style.height = '110px';
 	parentDiv.append(resultDiv);
 
 	return resultDiv;
 }
 
-// Function findAndRender(
-// 	resultDiv: HTMLDivElement,
-// 	options: Options,
-// 	data: Results,
-// ) {
-// 	// TODO: this is a hack, since the script is watching on so many observers,
-// 	// this will fire before the old page will render, so the div is already there.
-// 	// By putting it here, it is delayed enough to work properly
-// 	// const alreadyRan =
-// 	// 	document.body.querySelector(chainlinkAddedIdSelector) !== null;
-// 	// if (alreadyRan) {
-// 	// 	console.log(
-// 	// 		'seems like extension has already ran on this page, skipping...',
-// 	// 	);
-// 	// 	return;
-// 	// }
+type ObserverListener<ExpectedElement extends HTMLDivElement> = (
+	element: ExpectedElement,
+) => void;
 
-// 	renderInDiv(options, resultDiv, data);
-// }
+const animation = 'chainlink-selector-observer';
 
-let previousUrl = '';
-const observer = new MutationObserver(function (mutations) {
-	if (location.href !== previousUrl) {
-		previousUrl = location.href;
+// May need to limit this to one call per page, but for now, it's fine
+const registerAnimation = (): void => {
+	document.head.append('<style>{`@keyframes ${animation} {}`}</style>');
+};
 
-		console.log(
-			`URL changed to ${location.href}, triggering chainlink content script`,
-		);
-		addContent(location.href).catch((error: unknown) => {
-			console.error(error);
-		});
-	}
+async function delay(ms: number): Promise<void> {
+	return new Promise((resolve) => {
+		setTimeout(() => {
+			resolve();
+		}, ms);
+	});
+}
+
+export default function observe<Selector extends string>(
+	selectors: Selector | readonly Selector[],
+	listener: ObserverListener<HTMLDivElement>,
+): void {
+	const selector =
+		typeof selectors === 'string' ? selectors : selectors.join(',\n');
+	const seenMark = 'chainlink-seen';
+
+	registerAnimation();
+
+	const rule = document.createElement('style');
+	rule.textContent = `
+  		@keyframes chainlink-selector-observer {}
+		${String(selector)}:not(.${seenMark}) {
+			animation: 1ms ${animation};
+		}
+	`;
+	document.body.prepend(rule);
+
+	let called = false;
+	(async () => {
+		await delay(1000);
+		if (!called) {
+			console.warn('Chainlink Selector not found on page:', selector);
+		}
+	})();
+
+	globalThis.addEventListener('animationstart', (event: AnimationEvent) => {
+		const target = event.target as HTMLElement;
+		if (target.classList.contains(seenMark) || !target.matches(selector)) {
+			return;
+		}
+
+		called = true;
+		target.classList.add(seenMark);
+		listener(target);
+	});
+}
+
+observe('#partial-discussion-header', (element) => {
+	addContent(window.location.href, element).catch((error: unknown) => {
+		console.error(error);
+	});
 });
-
-// I tried to have this observer on less things, such as the request-id meta tag, but
-// since github does a lot of churn on the elements, best I could figure out is to watch
-// everything that changes in head and then make sure the logic only triggers once.
-const config = {subtree: true, childList: true};
-observer.observe(document.head, config);
