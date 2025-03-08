@@ -127,7 +127,7 @@ export default function observe<Selector extends string>(
 }
 
 observe('#partial-discussion-header', (element) => {
-	addContent(window.location.href, element).catch((error: unknown) => {
+	addContent(globalThis.location.href, element).catch((error: unknown) => {
 		console.error(error);
 	});
 });
