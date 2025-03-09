@@ -1,4 +1,4 @@
-import {type Options} from './options-storage.js';
+import {type Options, SubsectionSortingMethod} from './options-storage.js';
 import {type Results, type PrInfo, State, stateOrder} from './api.js';
 
 export function renderInDiv(
@@ -21,7 +21,7 @@ export function renderInDiv(
 		ancestorDiv.style.width = '33.3%';
 
 		renderHeader(ancestorDiv, 'Ancestor PRs');
-		renderList(ancestorDiv, results.ancestorPrs);
+		renderList(options, ancestorDiv, results.ancestorPrs);
 
 		resultDiv.append(ancestorDiv);
 
@@ -30,7 +30,7 @@ export function renderInDiv(
 
 		if (options.showSiblingPrs) {
 			renderHeader(siblingDiv, 'Sibling PRs');
-			renderList(siblingDiv, results.siblingPrs);
+			renderList(options, siblingDiv, results.siblingPrs);
 		}
 
 		resultDiv.append(siblingDiv);
@@ -39,7 +39,7 @@ export function renderInDiv(
 		descendantDiv.style.width = '33.3%';
 
 		renderHeader(descendantDiv, 'Descendant PRs');
-		renderList(descendantDiv, results.descendantPrs);
+		renderList(options, descendantDiv, results.descendantPrs);
 
 		resultDiv.append(descendantDiv);
 	}
@@ -52,21 +52,30 @@ function renderHeader(div: HTMLElement, text: string) {
 	div.append(header);
 }
 
-function renderList(div: HTMLElement, l: PrInfo[]) {
+function renderList(options: Options, div: HTMLElement, l: PrInfo[]) {
 	if (l.length > 0) {
 		const ul = document.createElement('ul');
 
 		ul.style.maxHeight = '110px'; // Room for 5
 		ul.style.overflowY = 'auto'; // Scrolls
 
-		// Sort by state (open vs closed, etc), then by number
+		// Sort by state (open vs closed, etc), then by method configured in options (defaults to descending)
 		l.sort((a, b) => {
 			const statesCompare = stateOrder[b.state] - stateOrder[a.state];
 			if (statesCompare !== 0) {
 				return statesCompare;
 			}
 
-			return a.number - b.number;
+			switch (options.subsectionSortingMethod) {
+				case SubsectionSortingMethod.Ascending: {
+					return a.number - b.number;
+				}
+
+				default: {
+					// Descending
+					return b.number - a.number;
+				}
+			}
 		});
 
 		for (const pr of l) {

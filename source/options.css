@@ -1,3 +1,8 @@
+.block {
+    display: block;
+    margin-bottom: 10px; /* Optional: Adds space between elements */
+}
+
 html {
 	min-width: 550px;
 	overflow-x: hidden; /* Required to hide horizontal scroll on Firefox */

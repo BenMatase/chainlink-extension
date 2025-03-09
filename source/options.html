@@ -16,7 +16,7 @@
 	</p>
 
 	<div class="text-inputs">
-		<label class="token-input">
+		<div class="token-input">
 			<span>Github Token</span>
 			<input
 				type="password"
@@ -41,15 +41,24 @@
 		</label>
 	</div>
 	<div class="bool-inputs">
-		<label class="feature-checkboxes">
+		<div class="feature-checkboxes">
 			<h2>Feature Checkboxes</h2>
 
-			<span>Show Sibling PRs:</span>
-			<input
-				type="checkbox"
-				name="showSiblingPrs"
-				checked
-			>
+			<div class="block">
+				<span>Show Sibling PRs:</span>
+				<input
+					type="checkbox"
+					name="showSiblingPrs"
+					checked
+				>
+			</div>
+			<div class="block">
+				<span>Subsection Sorting Method: </span>
+				<select name="subsectionSortingMethod">
+					<option value="Descending" selected>Descending</option>
+					<option value="Ascending">Ascending</option>
+				</select>
+			</div>
 		</label>
 	</div>
 </form>
