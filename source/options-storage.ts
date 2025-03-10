@@ -9,6 +9,7 @@ export type Options = {
 	token: string;
 	showSiblingPrs: boolean;
 	subsectionSortingMethod: SubsectionSortingMethod;
+	enableCache: boolean;
 };
 
 export const optionsStorage = new OptionsSync({
@@ -16,6 +17,7 @@ export const optionsStorage = new OptionsSync({
 		token: 'Enter your token here',
 		showSiblingPrs: true,
 		subsectionSortingMethod: SubsectionSortingMethod.Descending,
+		enableCache: true,
 	},
 	migrations: [OptionsSync.migrations.removeUnused],
 	logging: true,

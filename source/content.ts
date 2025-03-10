@@ -1,7 +1,13 @@
 import browser from 'webextension-polyfill';
+import isEqual from 'lodash/isEqual';
 import {optionsStorage, type Options} from './options-storage.js';
-import {generateResults, getOctokit, type Results} from './api.js';
-import {renderInDiv} from './render.js';
+import {
+	generateResults,
+	getOctokit,
+	type Results,
+	type PrIdentifier,
+} from './api.js';
+import {renderInDiv, showUpdateButton} from './render.js';
 
 console.log('💈 Content script loaded for', browser.runtime.getManifest().name);
 
@@ -38,9 +44,45 @@ async function addContent(url: string, parentDiv: HTMLDivElement) {
 		return;
 	}
 
-	generateResults(octokit, options, {owner, repo, number: pullNumber})
+	const prIdentifier: PrIdentifier = {owner, repo, number: pullNumber};
+
+	let cachedData: Results | undefined;
+	if (options.enableCache) {
+		cachedData = load(prIdentifier);
+		if (cachedData !== undefined) {
+			renderInDiv(options, resultDiv, cachedData);
+		}
+	}
+
+	generateResults(octokit, options, prIdentifier)
 		.then((data: Results) => {
-			renderInDiv(options, resultDiv, data);
+			if (cachedData === undefined) {
+				console.log('no cached data, rendering the fresh data');
+				if (options.enableCache) {
+					store(prIdentifier, data);
+				}
+
+				renderInDiv(options, resultDiv, data);
+				return;
+			}
+
+			if (options.enableCache && !isEqual(data, cachedData)) {
+				console.log(
+					'data has changed, storing and showing update button',
+					data,
+					'vs',
+					cachedData,
+				);
+				store(prIdentifier, data);
+
+				showUpdateButton(resultDiv, data)
+					.then(() => {
+						console.log('update button shown');
+					})
+					.catch((error: unknown) => {
+						console.error(error);
+					});
+			}
 		})
 		.catch((error: unknown) => {
 			console.error(error);
@@ -66,6 +108,21 @@ function prepopulateTheResultDiv(
 	parentDiv.append(resultDiv);
 
 	return resultDiv;
+}
+
+function store(prIdentifier: PrIdentifier, data: Results) {
+	console.log('storing data for', prIdentifier, 'with data', data);
+	localStorage.setItem(getLocalStorageKey(prIdentifier), JSON.stringify(data));
+}
+
+function load(prIdentifier: PrIdentifier): Results | undefined {
+	console.log('loading data for', prIdentifier);
+	const data = localStorage.getItem(getLocalStorageKey(prIdentifier));
+	return data ? (JSON.parse(data) as Results) : undefined;
+}
+
+function getLocalStorageKey(prIdentifier: PrIdentifier): string {
+	return `chainlink-${prIdentifier.owner}/${prIdentifier.repo}/${prIdentifier.number}`;
 }
 
 type ObserverListener<ExpectedElement extends HTMLDivElement> = (

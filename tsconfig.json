@@ -9,7 +9,7 @@
       "sourceMap": true,
       "skipLibCheck": true
     },
-    "types": ["@types/webextension-polyfill", "@octokit/types"],
+    "types": ["@types/webextension-polyfill", "@octokit/types", "@types/lodash"],
     "include": ["source/**/*.ts"],
     "exclude": ["node_modules", "distribution"]
   }

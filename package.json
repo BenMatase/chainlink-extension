@@ -33,6 +33,7 @@
 	},
 	"dependencies": {
 		"@octokit/core": "^6.1.2",
+		"lodash": "^4.17.21",
 		"octokit": "^4.1.1",
 		"webext-base-css": "^2.0.1",
 		"webext-options-sync": "^4.2.3",
@@ -44,6 +45,7 @@
 		"@parcel/resolver-default": "^2.13.0",
 		"@parcel/transformer-typescript-tsc": "^2.13.0",
 		"@types/chrome": "^0.0.308",
+		"@types/lodash": "^4.17.16",
 		"@types/webextension-polyfill": "^0.12.1",
 		"npm-run-all2": "^7.0.1",
 		"parcel": "^2.13.0",

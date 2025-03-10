@@ -1,11 +1,37 @@
-import {type Options, SubsectionSortingMethod} from './options-storage.js';
+import cloneDeep from 'lodash/cloneDeep';
+import {
+	type Options,
+	SubsectionSortingMethod,
+	optionsStorage,
+} from './options-storage.js';
 import {type Results, type PrInfo, State, stateOrder} from './api.js';
+
+export async function showUpdateButton(
+	resultDiv: HTMLDivElement,
+	results: Results,
+) {
+	const updateButton = document.createElement('button');
+	updateButton.textContent = 'Update Chainlink';
+	updateButton.addEventListener('click', async () => {
+		const options = await optionsStorage.getAll();
+		renderInDiv(options, resultDiv, results);
+	});
+
+	updateButton.style.height = '40px';
+
+	resultDiv.append(updateButton);
+}
+
+const numberSections = 3;
 
 export function renderInDiv(
 	options: Options,
 	resultDiv: HTMLDivElement,
 	results: Results,
 ) {
+	// Make a copy because rendering shouldn't affect the original data
+	results = cloneDeep(results);
+
 	if (resultDiv) {
 		// Clear out div
 		while (resultDiv.firstChild) {
@@ -15,10 +41,17 @@ export function renderInDiv(
 			}
 		}
 
+		let fullWidthPercentage = 100;
+		if (options.enableCache) {
+			fullWidthPercentage -= 10;
+		}
+
+		const widthPerSection = fullWidthPercentage / numberSections + '%';
+
 		resultDiv.style.display = 'flex';
 
 		const ancestorDiv = document.createElement('div');
-		ancestorDiv.style.width = '33.3%';
+		ancestorDiv.style.width = widthPerSection;
 
 		renderHeader(ancestorDiv, 'Ancestor PRs');
 		renderList(options, ancestorDiv, results.ancestorPrs);
@@ -26,7 +59,7 @@ export function renderInDiv(
 		resultDiv.append(ancestorDiv);
 
 		const siblingDiv = document.createElement('div');
-		siblingDiv.style.width = '33.3%';
+		siblingDiv.style.width = widthPerSection;
 
 		if (options.showSiblingPrs) {
 			renderHeader(siblingDiv, 'Sibling PRs');
@@ -36,7 +69,7 @@ export function renderInDiv(
 		resultDiv.append(siblingDiv);
 
 		const descendantDiv = document.createElement('div');
-		descendantDiv.style.width = '33.3%';
+		descendantDiv.style.width = widthPerSection;
 
 		renderHeader(descendantDiv, 'Descendant PRs');
 		renderList(options, descendantDiv, results.descendantPrs);

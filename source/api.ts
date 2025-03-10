@@ -39,7 +39,6 @@ export type Results = {
 	ancestorPrs: PrInfo[];
 	descendantPrs: PrInfo[];
 	siblingPrs: PrInfo[];
-	requestedPr: any;
 };
 
 async function getPr(
@@ -159,11 +158,18 @@ export async function generateResults(
 	]);
 
 	return {
-		ancestorPrs: ancestorPrs.map((x) => getInfo(x)),
-		descendantPrs: descendantPrs.map((x) => getInfo(x)),
-		siblingPrs: siblingPrs.map((x) => getInfo(x)),
-		requestedPr,
+		ancestorPrs: getResults(ancestorPrs),
+		descendantPrs: getResults(descendantPrs),
+		siblingPrs: getResults(siblingPrs),
 	};
+}
+
+// Convert to prinfos and then sort by number because we want them to be consistent when loading
+// them from storage for comparison purposes
+function getResults(prResponseData: PrResponseData[]): PrInfo[] {
+	return prResponseData
+		.map((x) => getInfo(x))
+		.sort((a, b) => a.number - b.number);
 }
 
 async function fetchAndFilterSibilingPrs(
