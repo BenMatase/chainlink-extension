@@ -32,7 +32,7 @@ export async function load(
 					resolve(undefined);
 				}
 
-                // have to store as string because indexedDB doesn't support cross-origin objects
+				// Have to store as string because indexedDB doesn't support cross-origin objects
 				const results = JSON.parse(getRequest.result as string) as Results;
 				resolve(results);
 			};
@@ -54,7 +54,7 @@ export async function store(
 	prIdentifier: PrIdentifier,
 	results: Results,
 ): Promise<void> {
-    // have to store as string because indexedDB doesn't support cross-origin objects
+	// Have to store as string because indexedDB doesn't support cross-origin objects
 	const data = JSON.stringify(results);
 
 	const key = getDatabaseKey(prIdentifier);
