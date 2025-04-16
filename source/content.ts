@@ -8,6 +8,7 @@ import {
 	type PrIdentifier,
 } from './api.js';
 import {renderInDiv, showUpdateButton} from './render.js';
+import {load, store} from './storage.js';
 
 console.log('💈 Content script loaded for', browser.runtime.getManifest().name);
 
@@ -48,7 +49,7 @@ async function addContent(url: string, parentDiv: HTMLDivElement) {
 
 	let cachedData: Results | undefined;
 	if (options.enableCache) {
-		cachedData = load(prIdentifier);
+		cachedData = await load(prIdentifier);
 		if (cachedData !== undefined) {
 			renderInDiv(options, resultDiv, cachedData);
 		}
@@ -59,7 +60,9 @@ async function addContent(url: string, parentDiv: HTMLDivElement) {
 			if (cachedData === undefined) {
 				console.log('no cached data, rendering the fresh data');
 				if (options.enableCache) {
-					store(prIdentifier, data);
+					store(prIdentifier, data).catch((error: unknown) => {
+						console.error('Failed to store data:', error);
+					});
 				}
 
 				renderInDiv(options, resultDiv, data);
@@ -73,7 +76,9 @@ async function addContent(url: string, parentDiv: HTMLDivElement) {
 					'vs',
 					cachedData,
 				);
-				store(prIdentifier, data);
+				store(prIdentifier, data).catch((error: unknown) => {
+					console.error('Failed to store data:', error);
+				});
 
 				showUpdateButton(resultDiv, data)
 					.then(() => {
@@ -108,21 +113,6 @@ function prepopulateTheResultDiv(
 	parentDiv.append(resultDiv);
 
 	return resultDiv;
-}
-
-function store(prIdentifier: PrIdentifier, data: Results) {
-	console.log('storing data for', prIdentifier, 'with data', data);
-	localStorage.setItem(getLocalStorageKey(prIdentifier), JSON.stringify(data));
-}
-
-function load(prIdentifier: PrIdentifier): Results | undefined {
-	console.log('loading data for', prIdentifier);
-	const data = localStorage.getItem(getLocalStorageKey(prIdentifier));
-	return data ? (JSON.parse(data) as Results) : undefined;
-}
-
-function getLocalStorageKey(prIdentifier: PrIdentifier): string {
-	return `chainlink-${prIdentifier.owner}/${prIdentifier.repo}/${prIdentifier.number}`;
 }
 
 type ObserverListener<ExpectedElement extends HTMLDivElement> = (
