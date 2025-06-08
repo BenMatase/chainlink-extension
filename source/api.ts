@@ -230,7 +230,8 @@ function getState(prResponseData: PrResponseData): State {
 		return State.Merged;
 	}
 
-	if (prResponseData.draft) {
+	// Only a draft is still open. Everything else takes precedence
+	if (prResponseData.draft && prResponseData.state === 'open') {
 		return State.Draft;
 	}
 
