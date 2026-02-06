@@ -110,6 +110,9 @@ function prepopulateTheResultDiv(
 	const resultDiv = document.createElement('div');
 	resultDiv.id = chainlinkAddedId;
 	resultDiv.style.height = '110px';
+	resultDiv.style.width = '100%';
+	resultDiv.style.marginTop = '1rem';
+
 	parentDiv.append(resultDiv);
 
 	return resultDiv;
@@ -173,7 +176,7 @@ export default function observe<Selector extends string>(
 	});
 }
 
-observe('#partial-discussion-header', (element) => {
+observe('.prc-PageHeader-Description-w-ejP', (element) => {
 	addContent(globalThis.location.href, element).catch((error: unknown) => {
 		console.error(error);
 	});

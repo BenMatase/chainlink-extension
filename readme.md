@@ -75,6 +75,14 @@ Using [web-ext](https://extensionworkshop.com/documentation/develop/getting-star
 
 You can also [load the extension manually in Chrome](https://www.smashingmagazine.com/2017/04/browser-extension-edge-chrome-firefox-opera-brave-vivaldi/#google-chrome-opera-vivaldi) or [Firefox](https://www.smashingmagazine.com/2017/04/browser-extension-edge-chrome-firefox-opera-brave-vivaldi/#mozilla-firefox).
 
+### Chrome
+
+Go to `chrome://extensions/` > `Load unpacked`
+
+### Firefox
+
+Go to `https://about:debugging#/runtime/this-firefox` and add it by choosing the `manifest.json`
+
 ### ✏️ Make a change
 
 1. Make your amazing change
