@@ -194,7 +194,7 @@ const stateDisplayMap: Record<State, StateDisplayInfo> = {
 
 const svgNamespace = 'http://www.w3.org/2000/svg';
 
-function getSvgFromPrInfo(prInfo: PrInfo): SVGSVGElement {
+export function getSvgFromPrInfo(prInfo: PrInfo): SVGSVGElement {
 	const svgElement = document.createElementNS(svgNamespace, 'svg');
 	svgElement.setAttribute('height', '16');
 	svgElement.setAttribute('width', '16');

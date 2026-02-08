@@ -1,0 +1,131 @@
+.root {
+	--gap: 8px;
+}
+
+html,
+body {
+	font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+	min-width: 320px;
+	min-height: 240px;
+	margin: 0;
+	padding: 12px;
+	background: #f6f8fa;
+}
+
+#root {
+	background: #fff;
+	border-radius: 10px;
+	padding: 12px;
+	box-shadow: 0 6px 18px rgb(9 30 66 / 8%);
+	max-width: 480px;
+}
+
+#root h3 {
+	margin: 0 0 10px;
+	font-size: 16px;
+}
+
+#status {
+	color: #586069;
+	margin-bottom: 10px;
+	font-size: 13px;
+}
+
+#tree {
+	max-height: 480px;
+	overflow: auto;
+	padding-right: 6px;
+}
+
+#tree ul {
+	list-style: none;
+	margin: 0;
+	padding-left: 8px;
+}
+
+#tree li {
+	margin: 6px 0;
+}
+
+.pr-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.toggle {
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	color: #57606a;
+	font-size: 12px;
+	line-height: 1;
+	padding: 2px 6px;
+	border-radius: 4px;
+}
+
+.toggle:hover {
+	background: rgb(3 102 214 / 6%);
+}
+
+.toggle.empty {
+	width: 18px;
+}
+
+.pr-link {
+	color: #0b67c2;
+	text-decoration: none;
+	font-size: 13px;
+}
+
+.pr-link:hover {
+	text-decoration: underline;
+}
+
+.pr-icon {
+	width: 16px;
+	height: 16px;
+	flex-shrink: 0;
+	display: inline-block;
+	margin-right: 8px;
+}
+
+/* Base rule for svg paths must come before more specific selectors */
+svg path {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+/* Color the imported SVG icons to match PR state */
+svg.color-fg-open path {
+	fill: #28a745;
+}
+/* Draft: GitHub uses a muted gray for draft state */
+svg.octicon-git-pull-request-draft path {
+	fill: #6e7781;
+}
+/* Merged: GitHub purple */
+svg.color-fg-done path {
+	fill: #6f42c1;
+}
+/* Closed: GitHub red */
+svg.closed path,
+svg.octicon-git-pull-request-closed path {
+	fill: #cb2431;
+}
+
+.pr-state.closed {
+	background: #f0f0f0;
+	color: #6a737d;
+}
+
+#tree ul ul {
+	margin-left: 10px;
+	border-left: 1px dashed rgb(16 22 26 / 6%);
+	padding-left: 12px;
+}
+
+button {
+	font-family: inherit;
+}
+
