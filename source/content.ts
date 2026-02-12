@@ -104,7 +104,8 @@ function prepopulateTheResultDiv(
 		console.log(
 			'seems like extension has already ran on this page, returning existing',
 		);
-		return oldResultDiv;
+		// Use the injected div as shared state: if it exists, do not run again
+		return undefined;
 	}
 
 	const resultDiv = document.createElement('div');
@@ -176,8 +177,13 @@ export default function observe<Selector extends string>(
 	});
 }
 
-observe('.prc-PageHeader-Description-w-ejP', (element) => {
-	addContent(globalThis.location.href, element).catch((error: unknown) => {
-		console.error(error);
-	});
-});
+// Observe both header selectors (either may appear); the injected `#chainlink-added`
+// element acts as the shared state so only the first match will proceed.
+observe(
+	['.prc-PageHeader-Description-w-ejP', '#partial-discussion-header'],
+	(element) => {
+		addContent(globalThis.location.href, element).catch((error: unknown) => {
+			console.error(error);
+		});
+	},
+);
