@@ -56,7 +56,7 @@
 		"svgo": "^3.3.2",
 		"typescript": "^5.4.2",
 		"webextension-manifest": "^1.0.0",
-		"xo": "^0.60.0"
+		"xo": "^1.2.3"
 	},
 	"@parcel/resolver-default": {
 		"packageExports": true
